@@ -1,5 +1,5 @@
 ﻿--[[
-  Gossip_Collector — Turtle WoW + SuperWoW (1.12 / Lua 5.1)
+  Gossip_Collector — Turtle WoW + SuperWoW (1.12 / Lua 5.0)
 
   On GOSSIP_SHOW, records one row per unique (npc GUID + gossip body hash):
     guid      — from UnitExists("npc") second return (SuperWoW; creature GUID 0xF130…)
@@ -29,6 +29,9 @@ local function chatEnabled()
   return GossipCollectorDB.chatMessages ~= false
 end
 
+-- Lua 5.0: math.mod; 5.1+: math.fmod (vanilla 1.12 is 5.0)
+local fmod = math.fmod or math.mod
+
 local function chatMsg(text)
   if chatEnabled() then
     DEFAULT_CHAT_FRAME:AddMessage(text)
@@ -44,7 +47,7 @@ local function StringHash(text)
   local pomoc = 0
   local dlug = string.len(text)
   for i = 1, dlug, 3 do
-    counter = math.fmod(counter * 8161, 4294967279)
+    counter = fmod(counter * 8161, 4294967279)
     pomoc = (string.byte(text, i) * 16776193)
     counter = counter + pomoc
     pomoc = ((string.byte(text, i + 1) or (dlug - i + 256)) * 8372226)
@@ -52,7 +55,7 @@ local function StringHash(text)
     pomoc = ((string.byte(text, i + 2) or (dlug - i + 256)) * 3932164)
     counter = counter + pomoc
   end
-  return math.fmod(counter, 4294967291)
+  return fmod(counter, 4294967291)
 end
 
 -- ——— GUID helpers (layout matches addon\NPCTracker\NPCTracker.lua) ———
@@ -78,8 +81,9 @@ local function CreatureEntryFromGuid(guid)
   if string.sub(g, 1, 4) ~= "F130" then
     return nil
   end
-  local hi = tonumber(string.sub(g, 1, 8), 16)
-  local lo = tonumber(string.sub(g, 9, 16), 16)
+  -- Lua 5.0 tonumber has no radix arg; hex via 0x prefix
+  local hi = tonumber("0x" .. string.sub(g, 1, 8))
+  local lo = tonumber("0x" .. string.sub(g, 9, 16))
   if not hi or not lo then
     return nil
   end
