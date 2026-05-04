@@ -1,0 +1,11 @@
+﻿## Interface: 11200
+## Title: Gossip-Collector
+## Version: 1.12-tw
+## Notes: Turtle WoW: gossip body + SuperWoW GUID + entry id → SavedVariables. /gc help
+## Author: Platine (original); Turtle port
+## eMail: platine.wow@gmail.com
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## SavedVariables: GossipCollectorDB
+
+Gossip_Collector.lua
